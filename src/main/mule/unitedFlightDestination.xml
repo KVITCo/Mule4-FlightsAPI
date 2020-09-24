@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="unitedFlightDestinationFlow" doc:id="39e090f8-512a-48d1-b6fb-5779fef21a1b" >
+		<logger level="INFO" doc:name="Logger" doc:id="1b45ade0-db05-4b9e-be66-dbb2ec808214" message="COme Into UF dwestinaton flowww..................................."/>
+		<set-variable value="attributes.vars.destination" doc:name="Set Variable" doc:id="e8db19f0-45e0-4adc-a861-09c44706d1d0" variableName="destination"/>
+		<http:request method="GET" doc:name="Request" doc:id="af90a353-9897-4e0e-b3db-4fc39d9ae965" config-ref="HTTP_Request_configuration" path="/essentials/united/flights/{to}">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	to : attributes.queryParams.destination
+}]]]></http:uri-params>
+		</http:request>
+	</flow>
+</mule>

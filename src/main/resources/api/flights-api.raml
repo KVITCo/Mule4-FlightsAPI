@@ -1,0 +1,49 @@
+#%RAML 1.0
+title: Flights-Api
+baseUri: http://localhost:8081/api
+/listAllUnitedFlights:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+/unitedFlightsByDestination:
+  get:
+    queryParameters:
+      destination:
+    responses:
+      200:
+        body:
+          application/json:
+/listAllDeltaFlights:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+/deltaFlightsByDestination:
+  get:
+    queryParameters:
+      destination:
+    responses:
+      200:
+        body:
+          application/json:
+/listAllFlights:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+/listAllFlightsByDestination:
+  get:
+    queryParameters:
+      destination:
+    responses:
+      200:
+        body:
+          application/json:
+            
+            
+
+  
