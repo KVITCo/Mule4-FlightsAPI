@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
-http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 	<flow name="deltaFlightsByDestinationFlow" doc:id="26e4939a-3881-4be9-83ed-425b635e5b63" >
 		<logger level="INFO" doc:name="Logger" doc:id="83500b27-1078-4361-915d-864078d04b34" message="delotaFlights by destination floww.................."/>
-		<set-variable value="attributes.vars.destination" doc:name="Set Variable" doc:id="f82b85fe-d6ea-439f-827d-0582725fcd3f" variableName="destination"/>
 		<ee:transform doc:name="Transform Message" doc:id="c10a1743-26ab-42d9-9906-8828815671f1" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
@@ -16,7 +16,7 @@ ns ns0 http://soap.training.mulesoft.com/
 ---
 {
 	ns0#findFlight: {
-		destination: vars.destination
+		destination: attributes.queryParams.destination as String
 	}
 }]]></ee:set-payload>
 			</ee:message>
