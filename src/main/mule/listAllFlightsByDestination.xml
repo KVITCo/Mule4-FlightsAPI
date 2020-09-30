@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="listAllFlightsByDestinationFlow" doc:id="f6759bfe-bfa7-4569-bdd1-f7385777a275" >
+		<logger level="INFO" doc:name="Logger" doc:id="20df8f65-2c60-4c3a-a921-6dd2902aa037" message="List all flights by destination......"/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="bb28c911-809f-4c77-8ee2-bca7399eda94" >
+			<route >
+				<flow-ref doc:name="uniterdflights by destination flow Reference" doc:id="12077a0b-280a-4fea-a6fe-b5dd4ec1802f" name="unitedFlightDestinationFlow"/>
+			</route>
+			<route >
+				<flow-ref doc:name="deltaFlightsbyDestination Flow Reference" doc:id="95a5343e-158c-4fc4-87d6-7a40ffc14b98" name="deltaFlightsByDestinationFlow"/>
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="Transform Message" doc:id="71048f8e-4b9d-4980-925c-a61fd8dbe46d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	unitedFlights:payload[0],
+	deltaFlights:payload[1]
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

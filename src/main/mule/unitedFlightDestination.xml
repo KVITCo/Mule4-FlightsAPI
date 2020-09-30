@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 	<flow name="unitedFlightDestinationFlow" doc:id="39e090f8-512a-48d1-b6fb-5779fef21a1b" >
 		<logger level="INFO" doc:name="Logger" doc:id="1b45ade0-db05-4b9e-be66-dbb2ec808214" message="COme Into UF dwestinaton flowww..................................."/>
 		<set-variable value="attributes.vars.destination" doc:name="Set Variable" doc:id="e8db19f0-45e0-4adc-a861-09c44706d1d0" variableName="destination"/>
@@ -14,5 +16,36 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 	to : attributes.queryParams.destination
 }]]]></http:uri-params>
 		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="b4bb1db7-05ac-473b-9b45-3310e6d7e0d2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="database Logger" doc:id="10926f74-f157-41ae-86db-244b8cc36875" message="mysql databse logger......."/>
+		<async doc:name="Async" doc:id="b79a9751-0c69-4d60-833f-c7e4e58b73d9" >
+			<db:insert doc:name="MYSQL/Insert" doc:id="6722b252-d4f7-440d-8996-1897cd1af5a3" config-ref="Database_Config">
+			<db:sql><![CDATA[insert into AUDIT_LOG(UniqueId,SourceApp,Request,Response,RequestTime,ResponseTime)values(:uniqueId,:sourceName,:request,:response,:requestTime,:responseTime);]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+	uniqueId:vars.uniqueId,
+	sourceName:vars.sourceName,
+	request:vars.request,
+	response:vars.response,
+	requestTime:vars.requestTime,
+	responseTime:vars.responseTime
+	}]]]></db:input-parameters>
+		</db:insert>
+		</async>
+		<logger level="INFO" doc:name="exit database Logger" doc:id="b010299a-6906-40d6-8bb6-0dd2010e634f" message="inserted values into data base"/>
+		<ee:transform doc:name="Transform Message" doc:id="c94161fe-68c3-4083-a078-f2450c87717c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 	</flow>
 </mule>

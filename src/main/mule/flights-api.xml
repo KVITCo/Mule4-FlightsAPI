@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
 http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
     <http:listener-config name="flights-api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8081" />
     </http:listener-config>
@@ -14,6 +15,9 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 			<wsc:web-service-security actor="http://schemas.xmlsoap.org/soap/actor/next" />
 		</wsc:connection>
 	</wsc:config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="e6977bd0-477f-4e17-a916-5cb86d809e81" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="root123" database="work" />
+	</db:config>
 	<flow name="flights-api-main">
         <http:listener config-ref="flights-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -147,6 +151,7 @@ output application/json
     </flow>
     <flow name="get:\listAllFlightsByDestination:flights-api-config">
         <logger level="INFO" message="get:\listAllFlightsByDestination:flights-api-config" />
+		<flow-ref doc:name="all flights by destination Flow Reference" doc:id="4fb606bb-7b01-4d88-9bee-0fbbf3783d38" name="listAllFlightsByDestinationFlow"/>
     </flow>
     <flow name="get:\listAllUnitedFlights:flights-api-config">
         <logger level="INFO" message="get:\listAllUnitedFlights:flights-api-config" />
@@ -154,6 +159,45 @@ output application/json
     </flow>
     <flow name="get:\unitedFlightsByDestination:flights-api-config">
         <logger level="INFO" message="get:\unitedFlightsByDestination:flights-api-config" />
+		<ee:transform doc:name="Transform Message" doc:id="82e93f40-7cee-43a8-8379-2accc717bc70" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="uniqueId" ><![CDATA[%dw 2.0
+output application/java
+---
+attributes.headers.uniqueId]]></ee:set-variable>
+				<ee:set-variable variableName="sourceName" ><![CDATA[%dw 2.0
+output application/java
+---
+attributes.headers.sourceName]]></ee:set-variable>
+				<ee:set-variable variableName="request" ><![CDATA[%dw 2.0
+output application/java
+---
+attributes.queryParams.destination]]></ee:set-variable>
+				<ee:set-variable variableName="response" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-variable>
+				<ee:set-variable variableName="requestTime" ><![CDATA[%dw 2.0
+output application/java
+---
+now() as String {format:"yyyy-MM-dd hh:MM:ss"}]]></ee:set-variable>
+				<ee:set-variable variableName="responseTime" ><![CDATA[%dw 2.0
+output application/java
+---
+now() as String {format:"yyyy-MM-dd hh:MM:ss"}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
 		<flow-ref doc:name="unitedFlightDestinationFlow Reference" doc:id="ecbbfe49-4e9b-4d60-8b37-a2f72856540d" name="unitedFlightDestinationFlow"/>
+		<error-handler>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="36cf9bb0-91c0-41bc-959a-2d0104262d81" type="ANY"/>
+		</error-handler>
     </flow>
 </mule>
